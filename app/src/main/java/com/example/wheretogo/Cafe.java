@@ -6,7 +6,6 @@ public class Cafe {
     private String description;
     private String imageBase64;
 
-    // Empty constructor for Firestore
     public Cafe() {}
 
     public Cafe(String name, String location, String imageBase64) {

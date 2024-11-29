@@ -56,7 +56,6 @@ public class RegisterActivity extends AppCompatActivity {
         String email = emailField.getText().toString().trim();
         String password = passwordField.getText().toString().trim();
 
-        // Input validation
         if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
@@ -72,7 +71,6 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // Register user in Firebase Authentication
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -82,7 +80,6 @@ public class RegisterActivity extends AppCompatActivity {
                 }
                 String userId = currentUser.getUid();
 
-                // Add user to Firestore
                 Map<String, Object> user = new HashMap<>();
                 user.put("name", name);
                 user.put("email", email);
@@ -91,7 +88,7 @@ public class RegisterActivity extends AppCompatActivity {
                 db.collection("Users").document(userId).set(user)
                         .addOnSuccessListener(aVoid -> {
                             Toast.makeText(this, "Welcome, " + name + "! Redirecting...", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(this, UserDashboardActivity.class));
+                            startActivity(new Intent(this, UserHomePageActivity.class));
                             finish();
                         })
                         .addOnFailureListener(e -> {

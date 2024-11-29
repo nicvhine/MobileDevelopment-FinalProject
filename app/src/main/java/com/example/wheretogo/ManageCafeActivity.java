@@ -1,9 +1,11 @@
 package com.example.wheretogo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -17,18 +19,20 @@ public class ManageCafeActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private TableLayout tableLayout;
+    private ImageView backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_cafe);
 
-        // Initialize Firebase Firestore
         db = FirebaseFirestore.getInstance();
         tableLayout = findViewById(R.id.tableLayout);
-
-        // Fetch cafes data from Firestore
+        backButton = findViewById(R.id.backbutton);
         fetchCafes();
+
+        backButton.setOnClickListener(view -> startActivity(new Intent(ManageCafeActivity.this, AdminHomePageActivity.class)));
+
     }
 
     private void fetchCafes() {
@@ -36,20 +40,10 @@ public class ManageCafeActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
-                        // Clear the table before adding new rows
                         tableLayout.removeAllViews();
 
-                        // Add header row (optional)
-                        TableRow headerRow = new TableRow(this);
-                        TextView headerCafeName = new TextView(this);
-                        headerCafeName.setText("Cafe Name");
-                        headerCafeName.setPadding(8, 8, 8, 8);
-                        headerRow.addView(headerCafeName);
 
 
-                        tableLayout.addView(headerRow);
-
-                        // Add rows dynamically for each cafe
                         for (DocumentSnapshot document : queryDocumentSnapshots) {
                             String cafeName = document.getString("name");
                             addCafeRow(cafeName, document);
@@ -57,58 +51,54 @@ public class ManageCafeActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Handle failure
+                    Toast.makeText(this, "Error fetching cafes", Toast.LENGTH_SHORT).show();
                 });
     }
 
     private void addCafeRow(String cafeName, DocumentSnapshot document) {
-        // Create a new row for each cafe
         TableRow row = new TableRow(this);
 
-        // Create TextView for Cafe Name
         TextView cafeNameTextView = new TextView(this);
         cafeNameTextView.setText(cafeName);
-        cafeNameTextView.setPadding(8, 8, 8, 8);
+        cafeNameTextView.setPadding(16, 16, 16, 16);
+        cafeNameTextView.setTextSize(16);
+        cafeNameTextView.setTextColor(getResources().getColor(R.color.white));
         row.addView(cafeNameTextView);
 
-        // Create Edit Details button
         Button editDetailsButton = new Button(this);
-        editDetailsButton.setText("Edit Details");
-        editDetailsButton.setPadding(8, 8, 8, 8);
-        editDetailsButton.setOnClickListener(v -> {
-            // Show the edit dialog with the current details
-            editCafeDetails(document);
-        });
+        editDetailsButton.setText("Edit");
+        editDetailsButton.setPadding(16, 16, 16, 16);
+        editDetailsButton.setBackgroundResource(R.drawable.button_style);
+        editDetailsButton.setTextColor(getResources().getColor(R.color.white));
+        editDetailsButton.setOnClickListener(v -> editCafeDetails(document));
 
         row.addView(editDetailsButton);
 
-        // Create Delete button
         Button deleteButton = new Button(this);
         deleteButton.setText("Delete");
-        deleteButton.setPadding(8, 8, 8, 8);
-        deleteButton.setOnClickListener(v -> {
-            // Delete the cafe from Firestore
-            deleteCafe(document);
-        });
+        deleteButton.setPadding(16, 16, 16, 16);
+        deleteButton.setBackgroundResource(R.drawable.button_style);
+        deleteButton.setTextColor(getResources().getColor(R.color.white));
+        deleteButton.setOnClickListener(v -> deleteCafe(document));
 
         row.addView(deleteButton);
 
-        // Add row to TableLayout
+            row.setBackgroundColor(getResources().getColor(R.color.gray));
+
+
+
         tableLayout.addView(row);
     }
 
     private void editCafeDetails(DocumentSnapshot cafeDocument) {
-        // Create an AlertDialog to edit cafe details
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Cafe Details");
 
-        // Set up the input fields for editing cafe details
         View dialogView = getLayoutInflater().inflate(R.layout.dialogue_edit_cafe, null);
         EditText cafeNameEditText = dialogView.findViewById(R.id.cafeNameEditText);
         EditText locationEditText = dialogView.findViewById(R.id.locationEditText);
         EditText descriptionEditText = dialogView.findViewById(R.id.descriptionEditText);
 
-        // Pre-fill the fields with current values
         cafeNameEditText.setText(cafeDocument.getString("name"));
         locationEditText.setText(cafeDocument.getString("location"));
         descriptionEditText.setText(cafeDocument.getString("description"));
@@ -116,7 +106,6 @@ public class ManageCafeActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         builder.setPositiveButton("Save", (dialog, which) -> {
-            // Get the updated values from the input fields
             String updatedCafeName = cafeNameEditText.getText().toString().trim();
             String updatedLocation = locationEditText.getText().toString().trim();
             String updatedDescription = descriptionEditText.getText().toString().trim();
@@ -126,7 +115,6 @@ public class ManageCafeActivity extends AppCompatActivity {
                 return;
             }
 
-            // Update the cafe details in Firestore
             cafeDocument.getReference()
                     .update("name", updatedCafeName, "location", updatedLocation, "description", updatedDescription)
                     .addOnSuccessListener(aVoid -> {
@@ -140,13 +128,10 @@ public class ManageCafeActivity extends AppCompatActivity {
 
         builder.setNegativeButton("Cancel", null);
 
-        // Show the dialog
         builder.create().show();
     }
 
-
     private void deleteCafe(DocumentSnapshot cafeDocument) {
-        // Delete the cafe from Firestore
         cafeDocument.getReference().delete()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(ManageCafeActivity.this, "Cafe deleted successfully", Toast.LENGTH_SHORT).show();
@@ -156,4 +141,7 @@ public class ManageCafeActivity extends AppCompatActivity {
                     Toast.makeText(ManageCafeActivity.this, "Error deleting cafe", Toast.LENGTH_SHORT).show();
                 });
     }
+
+
+
 }

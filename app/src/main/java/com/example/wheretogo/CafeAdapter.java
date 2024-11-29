@@ -39,7 +39,6 @@ public class CafeAdapter extends RecyclerView.Adapter<CafeAdapter.CafeViewHolder
         holder.cafeLocation.setText(cafe.getLocation());
         holder.cafeDescription.setText(cafe.getDescription());
 
-        // Decode the image from Base64 and set it in the ImageView
         String base64Image = cafe.getImageBase64();
         byte[] decodedBytes = Base64.decode(base64Image, Base64.DEFAULT);
         Bitmap decodedImage = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);

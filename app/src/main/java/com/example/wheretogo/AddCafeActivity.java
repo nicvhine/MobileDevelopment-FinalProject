@@ -42,11 +42,9 @@ public class AddCafeActivity extends AppCompatActivity {
 
 
 
-        // Initialize Firebase
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        // Bind UI components
         cafeNameField = findViewById(R.id.cafeNameField);
         locationField = findViewById(R.id.locationField);
         descriptionField = findViewById(R.id.descriptionField);
@@ -58,7 +56,6 @@ public class AddCafeActivity extends AppCompatActivity {
         backButton.setOnClickListener(view -> startActivity(new Intent(AddCafeActivity.this, AdminHomePageActivity.class)));
 
 
-        // Set up image picker
         ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
@@ -98,7 +95,6 @@ public class AddCafeActivity extends AppCompatActivity {
             return;
         }
 
-        // Save cafe data to Firestore
         Map<String, Object> cafe = new HashMap<>();
         cafe.put("name", cafeName);
         cafe.put("location", location);
@@ -120,24 +116,20 @@ public class AddCafeActivity extends AppCompatActivity {
 
     private String encodeImageToBase64(Uri imageUri) {
         try {
-            // Open the input stream for the selected image
             InputStream imageStream = getContentResolver().openInputStream(imageUri);
             Bitmap originalBitmap = BitmapFactory.decodeStream(imageStream);
 
-            // Resize the image (optional: adjust the scale factor based on your needs)
             int width = originalBitmap.getWidth();
             int height = originalBitmap.getHeight();
             float aspectRatio = (float) width / height;
-            int newWidth = 500;  // Resize to width of 500px (you can change this)
+            int newWidth = 500;
             int newHeight = (int) (newWidth / aspectRatio);
             Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
 
-            // Compress the image to reduce file size
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream); // Reduce quality to 80%
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
 
-            // Convert byte array to Base64 string
             return Base64.encodeToString(byteArray, Base64.DEFAULT);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

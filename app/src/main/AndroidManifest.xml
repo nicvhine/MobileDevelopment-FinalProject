@@ -25,9 +25,10 @@
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".LoginActivity"></activity>
         <activity android:name=".AddCafeActivity"></activity>
-        <activity android:name=".UserDashboardActivity"></activity>
-        <activity android:name=".AdminHomePageActivity"></activity>
+        <activity android:name=".UserHomePageActivity"></activity>
         <activity android:name=".ManageCafeActivity"></activity>
+        <activity android:name=".AdminHomePageActivity"></activity>
+
 
 
 

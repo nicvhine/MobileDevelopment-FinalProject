@@ -13,4 +13,6 @@
         <item name="android:queryBackground">@android:color/transparent</item> <!-- Optional: make background transparent -->
     </style>
 
+
+
 </resources>

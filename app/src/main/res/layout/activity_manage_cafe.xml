@@ -8,61 +8,84 @@
     tools:context=".ManageCafeActivity"
     android:background="@color/main">
 
-    <!-- TableLayout to create a table with three columns -->
-    <TableLayout
-        android:id="@+id/tableLayout"
+    <ScrollView
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="60dp">
+
+        <TableLayout
+            android:id="@+id/tableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="1"
+            android:divider="?android:attr/dividerHorizontal"
+            android:showDividers="middle">
+
+            <TableRow
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnSpan="3"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:text="Cafe Name"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white" />
+            </TableRow>
+
+            <TableRow
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/cafeNameTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnSpan="1"
+                    android:gravity="start"
+                    android:padding="8dp"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:text="Cafe ABC" />
+
+                <Button
+                    android:id="@+id/editDetailsButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:padding="8dp"
+                    android:text="Edit"
+                    android:background="@color/white"
+                    android:textColor="@color/white"/>
+
+                <Button
+                    android:id="@+id/deleteButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:padding="8dp"
+                    android:text="Delete"
+                    android:background="@color/white"
+                    android:textColor="@color/white"/>
+            </TableRow>
+
+
+        </TableLayout>
+    </ScrollView>
+
+    <ImageView
+        android:id="@+id/backbutton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:paddingTop="16dp"
-        android:stretchColumns="1"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <!-- Header Row -->
-        <TableRow>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnSpan="3"
-                android:gravity="center"
-                android:padding="8dp"
-                android:text="Cafe Name"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-        </TableRow>
-
-        <!-- Data Row Example -->
-        <TableRow>
-
-            <TextView
-                android:id="@+id/cafeNameTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:padding="8dp"
-                android:text="Cafe ABC" />
-
-            <Button
-                android:id="@+id/editDetailsButton"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:padding="8dp"
-                android:text="Edit Details" />
-
-            <Button
-                android:id="@+id/deleteButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:padding="8dp"
-                android:text="Delete" />
-        </TableRow>
-
-        <!-- Add more rows dynamically from code -->
-    </TableLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/baseline_arrow_back_ios_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

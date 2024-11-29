@@ -93,9 +93,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/descriptionField" />
 
-    <!-- Upload Image Button -->
 
-    <!-- Add Cafe Button -->
 
     <Button
         android:id="@+id/uploadImageButton"

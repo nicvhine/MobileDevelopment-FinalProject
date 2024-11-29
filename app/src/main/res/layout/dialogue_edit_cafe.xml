@@ -4,13 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ManageCafeActivity">
+    tools:context=".ManageCafeActivity"
+    android:background="@drawable/rounded_field">
 
-    <!-- Label for Cafe Name -->
     <TextView
         android:id="@+id/cafeNameLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:text="Cafe Name"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -19,7 +20,6 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="16dp"/>
 
-    <!-- Input field for cafe name -->
     <EditText
         android:id="@+id/cafeNameEditText"
         android:layout_width="0dp"
@@ -37,11 +37,11 @@
         app:layout_constraintTop_toBottomOf="@id/cafeNameLabel"
         android:layout_marginHorizontal="16dp"/>
 
-    <!-- Label for Location -->
     <TextView
         android:id="@+id/locationLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:text="Location"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -50,7 +50,6 @@
         app:layout_constraintTop_toBottomOf="@id/cafeNameEditText"
         android:layout_marginTop="16dp"/>
 
-    <!-- Input field for cafe location -->
     <EditText
         android:id="@+id/locationEditText"
         android:layout_width="0dp"
@@ -69,20 +68,19 @@
         app:layout_constraintTop_toBottomOf="@id/locationLabel"
         android:layout_marginHorizontal="16dp"/>
 
-    <!-- Label for Description -->
     <TextView
         android:id="@+id/descriptionLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Description"
         android:textSize="16sp"
+        android:layout_marginLeft="20dp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/locationEditText"
         android:layout_marginTop="16dp"/>
 
-    <!-- Input field for cafe description -->
     <EditText
         android:id="@+id/descriptionEditText"
         android:layout_width="0dp"

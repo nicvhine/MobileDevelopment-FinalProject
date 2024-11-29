@@ -2,33 +2,32 @@ package com.example.wheretogo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager; // Import LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class AdminHomePageActivity extends AppCompatActivity {
+public class UserHomePageActivity extends AppCompatActivity {
     private RecyclerView cafesRecyclerView;
     private CafeAdapter cafeAdapter;
     private List<Cafe> cafeList = new ArrayList<>();
     private List<Cafe> filteredCafes = new ArrayList<>();
     private FirebaseFirestore db;
-    private TextView addCafe;
     private TextView signOut;
-    private TextView manageList;
-    private ImageView refreshPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_homepage);
+        setContentView(R.layout.activity_user_homepage);
 
         db = FirebaseFirestore.getInstance();
         cafesRecyclerView = findViewById(R.id.cafesRecyclerView);
@@ -55,38 +54,15 @@ public class AdminHomePageActivity extends AppCompatActivity {
             }
         });
 
-        addCafe = findViewById(R.id.addCafeButton);
         signOut = findViewById(R.id.logouttext);
-        manageList = findViewById(R.id.manage);
-        refreshPage = findViewById(R.id.refresh);
 
-        addCafe.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminHomePageActivity.this, AddCafeActivity.class);
-            startActivity(intent);
-        });
 
-        manageList.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminHomePageActivity.this, ManageCafeActivity.class);
-            startActivity(intent);
-        });
-
-        refreshPage.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminHomePageActivity.this, AdminHomePageActivity.class);
-            startActivity(intent);
-        });
 
         signOut.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminHomePageActivity.this, LoginActivity.class);
+            Intent intent = new Intent(UserHomePageActivity.this, LoginActivity.class);
             startActivity(intent);
         });
 
-        manageList.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                manageList.setTextColor(getResources().getColor(android.R.color.holo_orange_light));  // Yellowish color
-            } else {
-                manageList.setTextColor(getResources().getColor(android.R.color.white));
-            }
-        });
     }
 
     private void fetchCafes() {
@@ -99,12 +75,12 @@ public class AdminHomePageActivity extends AppCompatActivity {
                             Cafe cafe = document.toObject(Cafe.class);
                             cafeList.add(cafe);
                         }
-                        filteredCafes.addAll(cafeList); // Initially display all cafes
+                        filteredCafes.addAll(cafeList);
                         cafeAdapter.notifyDataSetChanged();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(AdminHomePageActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserHomePageActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
