@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WhereToGo</string>
+    <string name="cloudinary_cloud_name">nicholevhine</string>
+    <string name="cloudinary_api_key">614698744541781</string>
+    <string name="cloudinary_api_secret">AUhCFCkPFwOXMllFyuUyD6MFNh8</string>
+
+</resources>

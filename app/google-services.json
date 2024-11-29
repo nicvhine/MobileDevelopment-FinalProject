@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "189641275242",
+    "project_id": "wheretogo-d8dd1",
+    "storage_bucket": "wheretogo-d8dd1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:189641275242:android:fef7e410e37924c7e75713",
+        "android_client_info": {
+          "package_name": "com.example.wheretogo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7bG58nUw-nETWDzkEKoHIqzJY5XUNNkw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

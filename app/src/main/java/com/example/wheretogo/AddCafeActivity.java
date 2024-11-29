@@ -1,0 +1,148 @@
+package com.example.wheretogo;
+
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Base64;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+public class AddCafeActivity extends AppCompatActivity {
+
+    private EditText cafeNameField, locationField, descriptionField;
+    private ImageView cafeImagePreview;
+    private Button uploadImageButton, addCafeButton;
+    private ImageView backButton;
+    private Uri selectedImageUri;
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_cafe);
+
+
+
+        // Initialize Firebase
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
+        // Bind UI components
+        cafeNameField = findViewById(R.id.cafeNameField);
+        locationField = findViewById(R.id.locationField);
+        descriptionField = findViewById(R.id.descriptionField);
+        cafeImagePreview = findViewById(R.id.cafeImagePreview);
+        backButton = findViewById(R.id.backbutton);
+        uploadImageButton = findViewById(R.id.uploadImageButton);
+        addCafeButton = findViewById(R.id.addCafeButton);
+
+        backButton.setOnClickListener(view -> startActivity(new Intent(AddCafeActivity.this, AdminHomePageActivity.class)));
+
+
+        // Set up image picker
+        ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        selectedImageUri = uri;
+                        // Preview the selected image
+                        cafeImagePreview.setImageURI(uri);
+                    }
+                });
+
+        uploadImageButton.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
+
+        addCafeButton.setOnClickListener(v -> addCafe());
+    }
+
+    private void addCafe() {
+        String cafeName = cafeNameField.getText().toString().trim();
+        String location = locationField.getText().toString().trim();
+        String description = descriptionField.getText().toString().trim();
+
+        if (cafeName.isEmpty() || location.isEmpty() || description.isEmpty() || selectedImageUri == null) {
+            Toast.makeText(this, "Please fill in all fields and upload an image", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Adding cafe...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        // Convert the image to a Base64 string
+        String base64Image = encodeImageToBase64(selectedImageUri);
+
+        if (base64Image == null) {
+            progressDialog.dismiss();
+            Toast.makeText(this, "Error encoding image", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Save cafe data to Firestore
+        Map<String, Object> cafe = new HashMap<>();
+        cafe.put("name", cafeName);
+        cafe.put("location", location);
+        cafe.put("description", description);
+        cafe.put("imageBase64", base64Image); // Save Base64 string
+        cafe.put("addedBy", mAuth.getCurrentUser().getUid());
+
+        db.collection("Cafes").add(cafe)
+                .addOnSuccessListener(documentReference -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(AddCafeActivity.this, "Cafe added successfully!", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(AddCafeActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private String encodeImageToBase64(Uri imageUri) {
+        try {
+            // Open the input stream for the selected image
+            InputStream imageStream = getContentResolver().openInputStream(imageUri);
+            Bitmap originalBitmap = BitmapFactory.decodeStream(imageStream);
+
+            // Resize the image (optional: adjust the scale factor based on your needs)
+            int width = originalBitmap.getWidth();
+            int height = originalBitmap.getHeight();
+            float aspectRatio = (float) width / height;
+            int newWidth = 500;  // Resize to width of 500px (you can change this)
+            int newHeight = (int) (newWidth / aspectRatio);
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
+
+            // Compress the image to reduce file size
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream); // Reduce quality to 80%
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+
+            // Convert byte array to Base64 string
+            return Base64.encodeToString(byteArray, Base64.DEFAULT);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+}
