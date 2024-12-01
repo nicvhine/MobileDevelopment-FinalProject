@@ -58,7 +58,6 @@ public class AdminHomePageActivity extends AppCompatActivity {
         addCafe = findViewById(R.id.addCafeButton);
         signOut = findViewById(R.id.logouttext);
         manageList = findViewById(R.id.manage);
-        refreshPage = findViewById(R.id.refresh);
 
         addCafe.setOnClickListener(v -> {
             Intent intent = new Intent(AdminHomePageActivity.this, AddCafeActivity.class);
@@ -70,10 +69,6 @@ public class AdminHomePageActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        refreshPage.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminHomePageActivity.this, AdminHomePageActivity.class);
-            startActivity(intent);
-        });
 
         signOut.setOnClickListener(v -> {
             Intent intent = new Intent(AdminHomePageActivity.this, LoginActivity.class);
@@ -90,23 +85,25 @@ public class AdminHomePageActivity extends AppCompatActivity {
     }
 
     private void fetchCafes() {
-        db.collection("Cafes")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        cafeList.clear();
-                        for (DocumentSnapshot document : queryDocumentSnapshots) {
-                            Cafe cafe = document.toObject(Cafe.class);
-                            cafeList.add(cafe);
-                        }
-                        filteredCafes.addAll(cafeList); // Initially display all cafes
-                        cafeAdapter.notifyDataSetChanged();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(AdminHomePageActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        db.collection("Cafes").addSnapshotListener((queryDocumentSnapshots, e) -> {
+            if (e != null) {
+                Toast.makeText(AdminHomePageActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (queryDocumentSnapshots != null) {
+                cafeList.clear();
+                filteredCafes.clear();
+                for (DocumentSnapshot document : queryDocumentSnapshots) {
+                    Cafe cafe = document.toObject(Cafe.class);
+                    cafeList.add(cafe);
+                }
+                filteredCafes.addAll(cafeList);
+                cafeAdapter.notifyDataSetChanged();
+            }
+        });
     }
+
 
     private void filterCafes(String query) {
         filteredCafes.clear();

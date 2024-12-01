@@ -5,10 +5,11 @@ public class Cafe {
     private String location;
     private String description;
     private String imageBase64;
+    private boolean isFavorite;
 
     public Cafe() {}
 
-    public Cafe(String name, String location, String imageBase64) {
+    public Cafe(String name, String location, String description, String imageBase64) {
         this.name = name;
         this.location = location;
         this.description = description;
@@ -30,5 +31,12 @@ public class Cafe {
     public String getImageBase64() {
         return imageBase64;
     }
-}
 
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean isFavorite) {
+        this.isFavorite = isFavorite;
+    }
+}

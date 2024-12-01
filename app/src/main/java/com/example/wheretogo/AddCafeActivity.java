@@ -24,6 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import android.view.View;
+
 
 public class AddCafeActivity extends AppCompatActivity {
 
@@ -61,9 +63,10 @@ public class AddCafeActivity extends AppCompatActivity {
                 uri -> {
                     if (uri != null) {
                         selectedImageUri = uri;
-                        // Preview the selected image
                         cafeImagePreview.setImageURI(uri);
+                        cafeImagePreview.setVisibility(View.VISIBLE);
                     }
+
                 });
 
         uploadImageButton.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
@@ -86,7 +89,6 @@ public class AddCafeActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        // Convert the image to a Base64 string
         String base64Image = encodeImageToBase64(selectedImageUri);
 
         if (base64Image == null) {

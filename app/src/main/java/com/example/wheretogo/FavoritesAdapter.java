@@ -16,33 +16,29 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
-public class CafeAdapter extends RecyclerView.Adapter<CafeAdapter.CafeViewHolder> {
-    private List<Cafe> cafes;
-    private Context context;
-    private List<Cafe> favoriteCafes = new ArrayList<>();
 
-    public CafeAdapter(Context context, List<Cafe> cafes) {
+public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavoriteViewHolder> {
+    private List<Cafe> favoriteCafes;
+    private Context context;
+
+    public FavoritesAdapter(Context context, List<Cafe> favoriteCafes) {
         this.context = context;
-        this.cafes = cafes;
-        loadFavorites();
+        this.favoriteCafes = favoriteCafes;
     }
 
     @NonNull
     @Override
-    public CafeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.admin_item_cafe, parent, false);
-        return new CafeViewHolder(view);
+    public FavoriteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.favorites_item_cafe, parent, false);
+        return new FavoriteViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CafeViewHolder holder, int position) {
-        Cafe cafe = cafes.get(position);
+    public void onBindViewHolder(@NonNull FavoriteViewHolder holder, int position) {
+        Cafe cafe = favoriteCafes.get(position);
 
         holder.cafeName.setText(cafe.getName());
         holder.cafeLocation.setText(cafe.getLocation());
@@ -55,45 +51,18 @@ public class CafeAdapter extends RecyclerView.Adapter<CafeAdapter.CafeViewHolder
             holder.cafeImage.setImageBitmap(decodedImage);
         }
 
-        if (favoriteCafes.contains(cafe)) {
-            holder.favoriteIcon.setImageResource(R.drawable.heart_filled_red);
-        } else {
-            holder.favoriteIcon.setImageResource(R.drawable.outline_favorite_border_24);
-        }
-
         holder.favoriteIcon.setOnClickListener(v -> {
-            if (favoriteCafes.contains(cafe)) {
-                favoriteCafes.remove(cafe);
-                holder.favoriteIcon.setImageResource(R.drawable.outline_favorite_border_24);
-                Toast.makeText(context, "Removed from favorites", Toast.LENGTH_SHORT).show();
-            } else {
-                favoriteCafes.add(cafe);
-                holder.favoriteIcon.setImageResource(R.drawable.heart_filled_red);
-                Toast.makeText(context, "Added to favorites", Toast.LENGTH_SHORT).show();
-            }
-
+            favoriteCafes.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, favoriteCafes.size());
+            Toast.makeText(context, "Removed from favorites", Toast.LENGTH_SHORT).show();
             updateFavorites();
         });
     }
 
     @Override
     public int getItemCount() {
-        return cafes.size();
-    }
-
-    private void loadFavorites() {
-        SharedPreferences prefs = context.getSharedPreferences("UserFavorites", Context.MODE_PRIVATE);
-        String json = prefs.getString("favorites", null);
-
-        if (json != null) {
-            Gson gson = new Gson();
-            Type type = new TypeToken<List<Cafe>>() {}.getType();
-            favoriteCafes = gson.fromJson(json, type);
-        }
-
-        if (favoriteCafes == null) {
-            favoriteCafes = new ArrayList<>();
-        }
+        return favoriteCafes.size();
     }
 
     private void updateFavorites() {
@@ -105,11 +74,11 @@ public class CafeAdapter extends RecyclerView.Adapter<CafeAdapter.CafeViewHolder
         editor.apply();
     }
 
-    public static class CafeViewHolder extends RecyclerView.ViewHolder {
+    public static class FavoriteViewHolder extends RecyclerView.ViewHolder {
         TextView cafeName, cafeLocation, cafeDescription;
         ImageView cafeImage, favoriteIcon;
 
-        public CafeViewHolder(@NonNull View itemView) {
+        public FavoriteViewHolder(@NonNull View itemView) {
             super(itemView);
             cafeName = itemView.findViewById(R.id.cafeName);
             cafeLocation = itemView.findViewById(R.id.cafeLocation);

@@ -22,7 +22,7 @@ public class UserHomePageActivity extends AppCompatActivity {
     private List<Cafe> cafeList = new ArrayList<>();
     private List<Cafe> filteredCafes = new ArrayList<>();
     private FirebaseFirestore db;
-    private TextView signOut;
+    private TextView signOut, favoriteIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,6 @@ public class UserHomePageActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         cafesRecyclerView = findViewById(R.id.cafesRecyclerView);
-
         cafesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         cafeAdapter = new CafeAdapter(this, filteredCafes);
@@ -55,19 +54,18 @@ public class UserHomePageActivity extends AppCompatActivity {
         });
 
         signOut = findViewById(R.id.logouttext);
-
-
-
         signOut.setOnClickListener(v -> {
-            Intent intent = new Intent(UserHomePageActivity.this, LoginActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(UserHomePageActivity.this, LoginActivity.class));
         });
 
+        favoriteIcon = findViewById(R.id.favoriteicon);
+        favoriteIcon.setOnClickListener(v -> {
+            startActivity(new Intent(UserHomePageActivity.this, FavoriteActivity.class));
+        });
     }
 
     private void fetchCafes() {
-        db.collection("Cafes")
-                .get()
+        db.collection("Cafes").get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         cafeList.clear();
@@ -75,13 +73,14 @@ public class UserHomePageActivity extends AppCompatActivity {
                             Cafe cafe = document.toObject(Cafe.class);
                             cafeList.add(cafe);
                         }
+                        filteredCafes.clear();
                         filteredCafes.addAll(cafeList);
                         cafeAdapter.notifyDataSetChanged();
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(UserHomePageActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e ->
+                        Toast.makeText(UserHomePageActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
     }
 
     private void filterCafes(String query) {
