@@ -60,6 +60,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cafeNameField" />
 
+    <EditText
+        android:id="@+id/phonenumberfield"
+        android:layout_width="350dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/rounded_field"
+        android:hint="Contact Number"
+        android:inputType="text"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/locationField" />
+
+    <EditText
+        android:id="@+id/emailfield"
+        android:layout_width="350dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/rounded_field"
+        android:hint="Email Address"
+        android:inputType="text"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/phonenumberfield" />
+
     <!-- Description Field -->
     <EditText
         android:id="@+id/descriptionField"
@@ -76,7 +108,7 @@
         android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/locationField" />
+        app:layout_constraintTop_toBottomOf="@id/emailfield" />
 
     <ImageView
         android:id="@+id/cafeImagePreview"

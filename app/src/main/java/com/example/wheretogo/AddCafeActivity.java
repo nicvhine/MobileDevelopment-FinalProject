@@ -29,7 +29,7 @@ import android.view.View;
 
 public class AddCafeActivity extends AppCompatActivity {
 
-    private EditText cafeNameField, locationField, descriptionField;
+    private EditText cafeNameField, locationField, descriptionField, phoneNumberField, emailField;
     private ImageView cafeImagePreview;
     private Button uploadImageButton, addCafeButton;
     private ImageView backButton;
@@ -42,14 +42,14 @@ public class AddCafeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_cafe);
 
-
-
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
         cafeNameField = findViewById(R.id.cafeNameField);
         locationField = findViewById(R.id.locationField);
         descriptionField = findViewById(R.id.descriptionField);
+        phoneNumberField = findViewById(R.id.phonenumberfield);
+        emailField = findViewById(R.id.emailfield);
         cafeImagePreview = findViewById(R.id.cafeImagePreview);
         backButton = findViewById(R.id.backbutton);
         uploadImageButton = findViewById(R.id.uploadImageButton);
@@ -57,16 +57,14 @@ public class AddCafeActivity extends AppCompatActivity {
 
         backButton.setOnClickListener(view -> startActivity(new Intent(AddCafeActivity.this, AdminHomePageActivity.class)));
 
-
         ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
                     if (uri != null) {
                         selectedImageUri = uri;
                         cafeImagePreview.setImageURI(uri);
-                        cafeImagePreview.setVisibility(View.VISIBLE);
+                        cafeImagePreview.setVisibility(View.VISIBLE);  // Show image preview
                     }
-
                 });
 
         uploadImageButton.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
@@ -78,9 +76,21 @@ public class AddCafeActivity extends AppCompatActivity {
         String cafeName = cafeNameField.getText().toString().trim();
         String location = locationField.getText().toString().trim();
         String description = descriptionField.getText().toString().trim();
+        String phoneNumber = phoneNumberField.getText().toString().trim();
+        String emailCafe = emailField.getText().toString().trim();
 
-        if (cafeName.isEmpty() || location.isEmpty() || description.isEmpty() || selectedImageUri == null) {
+        if (cafeName.isEmpty() || location.isEmpty() || description.isEmpty() || phoneNumber.isEmpty() || emailCafe.isEmpty() || selectedImageUri == null) {
             Toast.makeText(this, "Please fill in all fields and upload an image", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!isValidEmail(emailCafe)) {
+            emailField.setError("Invalid email address");
+            return;
+        }
+
+        if (!isValidPhoneNumber(phoneNumber)) {
+            phoneNumberField.setError("Invalid phone number");
             return;
         }
 
@@ -101,7 +111,9 @@ public class AddCafeActivity extends AppCompatActivity {
         cafe.put("name", cafeName);
         cafe.put("location", location);
         cafe.put("description", description);
-        cafe.put("imageBase64", base64Image); // Save Base64 string
+        cafe.put("phonenumber", phoneNumber);
+        cafe.put("email", emailCafe);
+        cafe.put("imageBase64", base64Image);
         cafe.put("addedBy", mAuth.getCurrentUser().getUid());
 
         db.collection("Cafes").add(cafe)
@@ -114,6 +126,14 @@ public class AddCafeActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                     Toast.makeText(AddCafeActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private boolean isValidEmail(String email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private boolean isValidPhoneNumber(String phoneNumber) {
+        return phoneNumber.matches("[0-9]+") && phoneNumber.length() >= 10;
     }
 
     private String encodeImageToBase64(Uri imageUri) {
@@ -138,5 +158,4 @@ public class AddCafeActivity extends AppCompatActivity {
             return null;
         }
     }
-
 }

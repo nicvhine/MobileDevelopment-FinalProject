@@ -29,6 +29,9 @@
         <activity android:name=".ManageCafeActivity"></activity>
         <activity android:name=".AdminHomePageActivity"></activity>
         <activity android:name=".FavoriteActivity"></activity>
+        <activity android:name=".ActivityAddProfile"></activity>
+        <activity android:name=".Settings"></activity>
+
 
 
 

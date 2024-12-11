@@ -33,7 +33,7 @@ public class FavoriteActivity extends AppCompatActivity {
 
         loadFavorites();
 
-        cafeAdapter = new CafeAdapter(this, favoriteCafes);
+        cafeAdapter = new CafeAdapter(this, favoriteCafes, false);
         favoritesRecyclerView.setAdapter(cafeAdapter);
 
         backArrow = findViewById(R.id.backarrow);

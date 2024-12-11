@@ -2,6 +2,7 @@ package com.example.wheretogo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class UserHomePageActivity extends AppCompatActivity {
@@ -21,8 +24,11 @@ public class UserHomePageActivity extends AppCompatActivity {
     private CafeAdapter cafeAdapter;
     private List<Cafe> cafeList = new ArrayList<>();
     private List<Cafe> filteredCafes = new ArrayList<>();
+    private List<Cafe> originalCafes = new ArrayList<>();
     private FirebaseFirestore db;
-    private TextView signOut, favoriteIcon;
+    private TextView signOut, favoriteIcon, settings;
+    private ImageView filterIc;
+    private boolean isSorted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +39,21 @@ public class UserHomePageActivity extends AppCompatActivity {
         cafesRecyclerView = findViewById(R.id.cafesRecyclerView);
         cafesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        cafeAdapter = new CafeAdapter(this, filteredCafes);
+        cafeAdapter = new CafeAdapter(this, filteredCafes, false);
         cafesRecyclerView.setAdapter(cafeAdapter);
+
+        filterIc = findViewById(R.id.filteric);
+        filterIc.setOnClickListener(v -> {
+            if (isSorted) {
+                filteredCafes.clear();
+                filteredCafes.addAll(originalCafes);
+                isSorted = false;
+            } else {
+                Collections.sort(filteredCafes, Comparator.comparing(Cafe::getName));
+                isSorted = true;
+            }
+            cafeAdapter.notifyDataSetChanged();
+        });
 
         fetchCafes();
 
@@ -62,6 +81,11 @@ public class UserHomePageActivity extends AppCompatActivity {
         favoriteIcon.setOnClickListener(v -> {
             startActivity(new Intent(UserHomePageActivity.this, FavoriteActivity.class));
         });
+
+        settings = findViewById(R.id.settingstxt);
+        settings.setOnClickListener(v -> {
+            startActivity(new Intent(UserHomePageActivity.this, Settings.class));
+        });
     }
 
     private void fetchCafes() {
@@ -75,6 +99,10 @@ public class UserHomePageActivity extends AppCompatActivity {
                         }
                         filteredCafes.clear();
                         filteredCafes.addAll(cafeList);
+
+                        originalCafes.clear();
+                        originalCafes.addAll(cafeList);
+
                         cafeAdapter.notifyDataSetChanged();
                     }
                 })
@@ -97,4 +125,5 @@ public class UserHomePageActivity extends AppCompatActivity {
         }
         cafeAdapter.notifyDataSetChanged();
     }
+
 }

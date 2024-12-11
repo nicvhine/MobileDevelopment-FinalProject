@@ -6,12 +6,17 @@ import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager; // Import LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class AdminHomePageActivity extends AppCompatActivity {
@@ -19,11 +24,13 @@ public class AdminHomePageActivity extends AppCompatActivity {
     private CafeAdapter cafeAdapter;
     private List<Cafe> cafeList = new ArrayList<>();
     private List<Cafe> filteredCafes = new ArrayList<>();
+    private List<Cafe> originalCafes = new ArrayList<>();
     private FirebaseFirestore db;
     private TextView addCafe;
     private TextView signOut;
     private TextView manageList;
-    private ImageView refreshPage;
+    private ImageView refresh, filterIc;
+    private boolean isSorted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +42,13 @@ public class AdminHomePageActivity extends AppCompatActivity {
 
         cafesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        cafeAdapter = new CafeAdapter(this, filteredCafes);
+        cafeAdapter = new CafeAdapter(this, filteredCafes, true);  // true for admin
         cafesRecyclerView.setAdapter(cafeAdapter);
+
+        filterIc = findViewById(R.id.filteric);
+        filterIc.setOnClickListener(v -> {
+            toggleSort();
+        });
 
         fetchCafes();
 
@@ -58,6 +70,7 @@ public class AdminHomePageActivity extends AppCompatActivity {
         addCafe = findViewById(R.id.addCafeButton);
         signOut = findViewById(R.id.logouttext);
         manageList = findViewById(R.id.manage);
+        refresh = findViewById(R.id.refresh);
 
         addCafe.setOnClickListener(v -> {
             Intent intent = new Intent(AdminHomePageActivity.this, AddCafeActivity.class);
@@ -69,7 +82,6 @@ public class AdminHomePageActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-
         signOut.setOnClickListener(v -> {
             Intent intent = new Intent(AdminHomePageActivity.this, LoginActivity.class);
             startActivity(intent);
@@ -77,7 +89,7 @@ public class AdminHomePageActivity extends AppCompatActivity {
 
         manageList.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
-                manageList.setTextColor(getResources().getColor(android.R.color.holo_orange_light));  // Yellowish color
+                manageList.setTextColor(getResources().getColor(android.R.color.holo_orange_light));
             } else {
                 manageList.setTextColor(getResources().getColor(android.R.color.white));
             }
@@ -85,25 +97,37 @@ public class AdminHomePageActivity extends AppCompatActivity {
     }
 
     private void fetchCafes() {
-        db.collection("Cafes").addSnapshotListener((queryDocumentSnapshots, e) -> {
-            if (e != null) {
-                Toast.makeText(AdminHomePageActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (queryDocumentSnapshots != null) {
-                cafeList.clear();
-                filteredCafes.clear();
-                for (DocumentSnapshot document : queryDocumentSnapshots) {
-                    Cafe cafe = document.toObject(Cafe.class);
-                    cafeList.add(cafe);
-                }
-                filteredCafes.addAll(cafeList);
-                cafeAdapter.notifyDataSetChanged();
-            }
-        });
+        db.collection("Cafes").get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        cafeList.clear();
+                        filteredCafes.clear();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Cafe cafe = document.toObject(Cafe.class);
+                            if (cafe != null) {
+                                cafeList.add(cafe);
+                            }
+                        }
+                        filteredCafes.addAll(cafeList);
+                        originalCafes.addAll(cafeList);
+                        cafeAdapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(AdminHomePageActivity.this, "Error fetching cafes", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
+    private void toggleSort() {
+        if (isSorted) {
+            filteredCafes.clear();
+            filteredCafes.addAll(originalCafes);
+            isSorted = false;
+        } else {
+            Collections.sort(filteredCafes, Comparator.comparing(Cafe::getName));
+            isSorted = true;
+        }
+        cafeAdapter.notifyDataSetChanged();
+    }
 
     private void filterCafes(String query) {
         filteredCafes.clear();

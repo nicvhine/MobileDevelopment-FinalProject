@@ -38,17 +38,18 @@
         android:id="@+id/cafeLocation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="60dp"
         android:text="Location"
         android:textColor="@color/white"
         android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/informationicon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cafeName" />
 
     <TextView
         android:id="@+id/description"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="1dp"
         android:layout_marginTop="4dp"
@@ -58,13 +59,25 @@
         app:layout_constraintTop_toBottomOf="@+id/cafeLocation" />
 
     <ImageView
+        android:id="@+id/favoriteicon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="20dp"
+        android:contentDescription="Favorite Icon"
+        android:src="@drawable/outline_favorite_border_24"
+        app:layout_constraintStart_toEndOf="@+id/cafeName"
+        app:layout_constraintTop_toBottomOf="@+id/cafeImage" />
+
+    <ImageView
         android:id="@+id/informationicon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="19dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toStartOf="@+id/favoriteicon"
         app:layout_constraintTop_toBottomOf="@+id/cafeImage"
         app:srcCompat="@drawable/baseline_info_outline_24" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

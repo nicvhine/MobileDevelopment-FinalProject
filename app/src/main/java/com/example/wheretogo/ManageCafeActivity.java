@@ -126,12 +126,16 @@ public class ManageCafeActivity extends AppCompatActivity {
         EditText cafeNameEditText = dialogView.findViewById(R.id.cafeNameEditText);
         EditText locationEditText = dialogView.findViewById(R.id.locationEditText);
         EditText descriptionEditText = dialogView.findViewById(R.id.descriptionEditText);
+        EditText phoneEditText = dialogView.findViewById(R.id.phoneEditText);  // Added Phone Edit
+        EditText emailEditText = dialogView.findViewById(R.id.emailEditText);  // Added Email Edit
         ImageView imagePreview = dialogView.findViewById(R.id.imagePreview);
         Button changeImageButton = dialogView.findViewById(R.id.changeImageButton);
 
         cafeNameEditText.setText(cafeDocument.getString("name"));
         locationEditText.setText(cafeDocument.getString("location"));
         descriptionEditText.setText(cafeDocument.getString("description"));
+        phoneEditText.setText(cafeDocument.getString("phonenumber"));
+        emailEditText.setText(cafeDocument.getString("email"));
 
         String imageBase64 = cafeDocument.getString("imageBase64");
         if (imageBase64 != null) {
@@ -151,14 +155,17 @@ public class ManageCafeActivity extends AppCompatActivity {
             String updatedCafeName = cafeNameEditText.getText().toString().trim();
             String updatedLocation = locationEditText.getText().toString().trim();
             String updatedDescription = descriptionEditText.getText().toString().trim();
+            String updatedPhoneNumber = phoneEditText.getText().toString().trim();
+            String updatedEmail = emailEditText.getText().toString().trim();
 
-            if (updatedCafeName.isEmpty() || updatedLocation.isEmpty() || updatedDescription.isEmpty()) {
+            if (updatedCafeName.isEmpty() || updatedLocation.isEmpty() || updatedDescription.isEmpty() || updatedPhoneNumber.isEmpty() || updatedEmail.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             cafeDocument.getReference()
-                    .update("name", updatedCafeName, "location", updatedLocation, "description", updatedDescription)
+                    .update("name", updatedCafeName, "location", updatedLocation, "description", updatedDescription,
+                            "phonenumber", updatedPhoneNumber, "email", updatedEmail)
                     .addOnSuccessListener(aVoid -> {
                         if (selectedImageUri != null) {
                             String updatedImageBase64 = encodeImageToBase64(selectedImageUri);
@@ -175,6 +182,7 @@ public class ManageCafeActivity extends AppCompatActivity {
         builder.setNegativeButton("Cancel", null);
         builder.create().show();
     }
+
 
 
     private void deleteCafe(DocumentSnapshot cafeDocument) {

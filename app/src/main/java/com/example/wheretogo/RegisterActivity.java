@@ -88,7 +88,7 @@ public class RegisterActivity extends AppCompatActivity {
                 db.collection("Users").document(userId).set(user)
                         .addOnSuccessListener(aVoid -> {
                             Toast.makeText(this, "Welcome, " + name + "! Redirecting...", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(this, UserHomePageActivity.class));
+                            startActivity(new Intent(this, ActivityAddProfile.class));
                             finish();
                         })
                         .addOnFailureListener(e -> {
