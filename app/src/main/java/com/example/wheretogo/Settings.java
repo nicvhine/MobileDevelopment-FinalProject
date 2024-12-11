@@ -3,7 +3,9 @@ package com.example.wheretogo;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -13,14 +15,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 public class Settings extends AppCompatActivity {
 
@@ -31,6 +38,9 @@ public class Settings extends AppCompatActivity {
     private ImageView editProfileButton;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int CAMERA_REQUEST = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +77,72 @@ public class Settings extends AppCompatActivity {
         deleteProfileButton.setOnClickListener(v -> {
             deleteProfile();
         });
+
+        profileImageView.setOnClickListener(v -> selectImageOption());
     }
+
+    private void selectImageOption() {
+        CharSequence[] options = {"Choose from Gallery", "Take a Photo", "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Change Profile Picture");
+        builder.setItems(options, (dialog, which) -> {
+            switch (which) {
+                case 0:
+                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(pickPhoto, PICK_IMAGE_REQUEST);
+                    break;
+                case 1:
+                    Intent takePhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(takePhoto, CAMERA_REQUEST);
+                    break;
+                case 2:
+                    dialog.dismiss();
+                    break;
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            Bitmap selectedImage = null;
+            if (requestCode == PICK_IMAGE_REQUEST && data != null) {
+                Uri imageUri = data.getData();
+                try {
+                    selectedImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (requestCode == CAMERA_REQUEST && data != null) {
+                selectedImage = (Bitmap) data.getExtras().get("data");
+            }
+
+            if (selectedImage != null) {
+                profileImageView.setImageBitmap(selectedImage);
+                uploadImageToFirestore(selectedImage);
+            }
+        }
+    }
+
+    private void uploadImageToFirestore(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+
+        String userId = mAuth.getCurrentUser().getUid();
+        Map<String, Object> update = new HashMap<>();
+        update.put("profilepic", base64Image);
+
+        db.collection("Users").document(userId)
+                .update(update)
+                .addOnSuccessListener(aVoid -> Toast.makeText(Settings.this, "Profile photo updated successfully", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(Settings.this, "Failed to update profile photo: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
 
     private void fetchUserProfile() {
         String userId = mAuth.getCurrentUser().getUid();
